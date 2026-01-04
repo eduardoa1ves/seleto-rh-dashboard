@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://seleto.amarko.com.br:3000';
 
 class ApiClient {
   private token: string | null = localStorage.getItem('token');
