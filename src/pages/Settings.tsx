@@ -1,19 +1,39 @@
-import { User, Building, Bell, Shield, CreditCard, HelpCircle } from 'lucide-react';
+import { User, Building, Bell, Shield, HelpCircle, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const settingsSections = [
   { id: 'profile', icon: User, label: 'Perfil' },
   { id: 'company', icon: Building, label: 'Empresa' },
   { id: 'notifications', icon: Bell, label: 'Notificações' },
   { id: 'security', icon: Shield, label: 'Segurança' },
-  { id: 'billing', icon: CreditCard, label: 'Faturamento' },
   { id: 'help', icon: HelpCircle, label: 'Ajuda' },
 ];
 
 export default function Settings() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -94,24 +114,46 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Plan Section */}
-          <div className="rounded-xl border border-accent/20 bg-accent/5 p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Security & Logout Section */}
+          <div className="rounded-xl border border-border bg-card p-6 shadow-card">
+            <h2 className="mb-6 text-lg font-semibold text-foreground">Segurança e Sessão</h2>
+            
+            <div className="space-y-4">
               <div>
-                <h2 className="text-lg font-semibold text-foreground">Plano Pro</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  50 análises por mês • Relatórios avançados • Suporte prioritário
+                <h3 className="mb-2 font-medium text-foreground">Senha</h3>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  Altere sua senha regularmente para manter sua conta segura
                 </p>
+                <Button variant="outline">Alterar Senha</Button>
               </div>
-              <Button variant="outline">Gerenciar Plano</Button>
-            </div>
-            <div className="mt-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">47 análises restantes</span>
-                <span className="font-medium text-foreground">94%</span>
-              </div>
-              <div className="mt-2 h-2 w-full rounded-full bg-secondary">
-                <div className="h-full w-[94%] rounded-full bg-accent" />
+
+              <div className="border-t border-border pt-4">
+                <h3 className="mb-2 font-medium text-foreground">Encerrar Sessão</h3>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  Saia da sua conta em todos os dispositivos
+                </p>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sair da Conta
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Tem certeza que deseja sair?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Você será desconectado da sua conta e redirecionado para a página de login.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleLogout}>
+                        Sair
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </div>

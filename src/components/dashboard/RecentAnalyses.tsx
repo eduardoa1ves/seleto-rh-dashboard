@@ -31,10 +31,17 @@ function ScoreBadge({ score }: { score: number }) {
 
 function SeniorityBadge({ level }: { level: string }) {
   const labels: Record<string, string> = {
+    estagiario: 'Estagiário',
+    assistente: 'Assistente',
     junior: 'Júnior',
     pleno: 'Pleno',
     senior: 'Sênior',
     especialista: 'Especialista',
+    lider: 'Líder',
+    coordenador: 'Coordenador',
+    gerente: 'Gerente',
+    diretor: 'Diretor',
+    executivo: 'Executivo',
   };
 
   return (
@@ -75,28 +82,28 @@ export function RecentAnalyses({ analyses, onViewAnalysis }: RecentAnalysesProps
           >
             <div className="flex items-center gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
-                {analysis.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                {analysis.candidate.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-foreground">{analysis.name}</h3>
-                  <SeniorityBadge level={analysis.seniorityLevel} />
+                  <h3 className="font-medium text-foreground">{analysis.candidate.name}</h3>
+                  <SeniorityBadge level={analysis.seniority_level} />
                 </div>
                 <div className="mt-0.5 flex items-center gap-3 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Briefcase className="h-3.5 w-3.5" />
-                    {analysis.targetRole}
+                    {analysis.target_role || 'N/A'}
                   </span>
                   <span className="text-border">•</span>
                   <span>
-                    {format(new Date(analysis.analyzedAt), "d 'de' MMM, HH:mm", { locale: ptBR })}
+                    {format(new Date(analysis.analyzed_at), "d 'de' MMM, HH:mm", { locale: ptBR })}
                   </span>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
-              <ScoreBadge score={analysis.fitScore} />
+              <ScoreBadge score={analysis.fit_score} />
               <Button
                 variant="ghost"
                 size="sm"

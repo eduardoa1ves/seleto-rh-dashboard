@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { Upload, FileText, Image, X } from 'lucide-react';
+import { useCallback, useState, useRef } from 'react';
+import { Upload, FileText, Image, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -11,11 +11,13 @@ interface FileDropzoneProps {
 export function FileDropzone({ onFileUpload, isUploading }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    if (isUploading) return;
     setIsDragging(true);
-  }, []);
+  }, [isUploading]);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -24,13 +26,14 @@ export function FileDropzone({ onFileUpload, isUploading }: FileDropzoneProps) {
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    if (isUploading) return;
     setIsDragging(false);
-    
+
     const file = e.dataTransfer.files[0];
     if (file && (file.type === 'application/pdf' || file.type.startsWith('image/'))) {
       setSelectedFile(file);
     }
-  }, []);
+  }, [isUploading]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,6 +50,15 @@ export function FileDropzone({ onFileUpload, isUploading }: FileDropzoneProps) {
 
   const clearFile = () => {
     setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerFileSelect = () => {
+    if (!isUploading) {
+      fileInputRef.current?.click();
+    }
   };
 
   return (
@@ -55,61 +67,81 @@ export function FileDropzone({ onFileUpload, isUploading }: FileDropzoneProps) {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onClick={!selectedFile ? triggerFileSelect : undefined}
         className={cn(
           'relative rounded-xl border-2 border-dashed transition-all duration-300',
-          'bg-card hover:bg-secondary/30',
+          'bg-card',
+          !selectedFile && 'cursor-pointer hover:bg-secondary/30 hover:border-primary/50',
           isDragging
-            ? 'border-accent bg-accent/5 scale-[1.02]'
-            : 'border-border hover:border-primary/50',
-          selectedFile && 'border-solid border-accent/50 bg-accent/5'
+            ? 'border-accent bg-accent/5 scale-[1.01]'
+            : 'border-border',
+          selectedFile && 'border-solid border-success/30 bg-success/5'
         )}
       >
         <input
+          ref={fileInputRef}
           type="file"
           accept=".pdf,image/*"
           onChange={handleFileSelect}
-          className="absolute inset-0 z-10 cursor-pointer opacity-0"
+          className="hidden"
           disabled={isUploading}
         />
-        
-        <div className="flex flex-col items-center justify-center px-6 py-12">
+
+        <div className="flex flex-col items-center justify-center px-6 py-10">
           {selectedFile ? (
-            <div className="text-center animate-fade-in">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
-                {selectedFile.type === 'application/pdf' ? (
-                  <FileText className="h-8 w-8 text-accent" />
-                ) : (
-                  <Image className="h-8 w-8 text-accent" />
-                )}
-              </div>
-              <p className="text-lg font-medium text-foreground">{selectedFile.name}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-              </p>
-              <div className="mt-6 flex items-center justify-center gap-3">
+            <div className="w-full max-w-md animate-fade-in">
+              <div className="flex items-center gap-4 rounded-lg border border-success/20 bg-background p-4 shadow-sm">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-success/10">
+                  {selectedFile.type === 'application/pdf' ? (
+                    <FileText className="h-6 w-6 text-success" />
+                  ) : (
+                    <Image className="h-6 w-6 text-success" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {selectedFile.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB • Pronto para análise
+                  </p>
+                </div>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="ghost"
+                  size="icon"
                   onClick={(e) => {
                     e.stopPropagation();
                     clearFile();
                   }}
-                  className="relative z-20"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 >
-                  <X className="mr-1 h-4 w-4" />
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Button
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearFile();
+                  }}
+                  disabled={isUploading}
+                  className="sm:w-32"
+                >
                   Remover
                 </Button>
                 <Button
                   variant="success"
-                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleAnalyze();
                   }}
                   disabled={isUploading}
-                  className="relative z-20"
+                  className="sm:min-w-[160px]"
                 >
-                  Analisar Currículo
+                  {isUploading ? 'Analisando...' : 'Analisar Currículo'}
+                  {!isUploading && <Check className="ml-2 h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -130,12 +162,12 @@ export function FileDropzone({ onFileUpload, isUploading }: FileDropzoneProps) {
               <p className="mt-1 text-sm text-muted-foreground">
                 ou clique para selecionar um arquivo
               </p>
-              <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <FileText className="h-4 w-4" /> PDF
+              <div className="mt-6 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1">
+                  <FileText className="h-3.5 w-3.5" /> PDF
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Image className="h-4 w-4" /> Imagem
+                <span className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1">
+                  <Image className="h-3.5 w-3.5" /> Imagem
                 </span>
               </div>
             </div>

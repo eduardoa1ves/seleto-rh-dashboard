@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { 
-  Sparkles, 
-  FileSearch, 
-  BarChart3, 
-  Zap, 
-  Shield, 
-  Users, 
+import {
+  Sparkles,
+  FileSearch,
+  BarChart3,
+  Zap,
+  Shield,
+  Users,
   CheckCircle2,
   ArrowRight,
   Star
@@ -29,16 +29,16 @@ const features = [
     description: 'Análise completa em menos de 30 segundos. Economize horas do seu time de RH.',
   },
   {
-    icon: Shield,
-    title: 'LGPD Compliant',
-    description: 'Seus dados e dos candidatos protegidos com criptografia e conformidade total com a LGPD.',
+    icon: Users,
+    title: 'Histórico Completo',
+    description: 'Acesse todas as análises realizadas, compare candidatos e tome decisões mais assertivas.',
   },
 ];
 
 const stats = [
-  { value: '50K+', label: 'Currículos Analisados' },
-  { value: '98%', label: 'Precisão na Extração' },
-  { value: '500+', label: 'Empresas Confiam' },
+  { value: '1K+', label: 'Currículos Analisados' },
+  { value: '95%', label: 'Precisão na Extração' },
+  { value: '50+', label: 'Empresas Confiam' },
   { value: '30s', label: 'Tempo Médio de Análise' },
 ];
 
@@ -60,31 +60,33 @@ const testimonials = [
 const pricingPlans = [
   {
     name: 'Starter',
-    price: 'R$ 97',
+    price: 'R$ 47',
     period: '/mês',
     description: 'Para pequenas empresas',
-    features: ['20 análises/mês', 'Relatórios básicos', 'Suporte por email', '1 usuário'],
+    features: ['20 análises/mês', 'Análise de soft e hard skills', 'Score de senioridade', 'Histórico completo'],
     highlighted: false,
   },
   {
     name: 'Pro',
-    price: 'R$ 297',
+    price: 'R$ 197',
     period: '/mês',
     description: 'Para times de RH',
-    features: ['100 análises/mês', 'Relatórios avançados', 'Suporte prioritário', '5 usuários', 'API de integração'],
+    features: ['100 análises/mês', 'Todos os recursos do Starter', 'Suporte por email', 'Créditos nunca expiram'],
     highlighted: true,
   },
   {
-    name: 'Enterprise',
+    name: 'Business',
     price: 'Sob consulta',
     period: '',
     description: 'Para grandes operações',
-    features: ['Análises ilimitadas', 'Relatórios customizados', 'Suporte dedicado', 'Usuários ilimitados', 'API + Webhooks', 'SLA garantido'],
+    features: ['Créditos ilimitados', 'Todos os recursos do Pro', 'Suporte prioritário', 'Relatórios avançados'],
     highlighted: false,
   },
 ];
 
 export default function Landing() {
+  const isLoggedIn = !!localStorage.getItem('token');
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -99,15 +101,22 @@ export default function Landing() {
           <nav className="hidden items-center gap-6 md:flex">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Funcionalidades</a>
             <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Preços</a>
-            <a href="#testimonials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Depoimentos</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild>
-              <Link to="/login">Entrar</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/cadastro">Começar Grátis</Link>
-            </Button>
+            {isLoggedIn ? (
+              <Button asChild>
+                <Link to="/dashboard">Acessar Painel</Link>
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Entrar</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/cadastro">Começar Grátis</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -117,10 +126,6 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
         <div className="container relative mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5 text-sm text-accent">
-              <Sparkles className="h-4 w-4" />
-              Powered by AI
-            </div>
             <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Recrutamento Inteligente com{' '}
               <span className="text-primary">Análise de IA</span>
@@ -136,11 +141,11 @@ export default function Landing() {
                 </Link>
               </Button>
               <Button variant="outline" size="xl" asChild>
-                <Link to="/creditos">Ver Planos</Link>
+                <Link to="/login">Ver Como Funciona</Link>
               </Button>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              5 análises grátis • Sem cartão de crédito
+              10 análises grátis • Sem cartão de crédito
             </p>
           </div>
         </div>
@@ -173,7 +178,7 @@ export default function Landing() {
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature) => (
-              <div 
+              <div
                 key={feature.title}
                 className="group rounded-xl border border-border bg-card p-6 shadow-card transition-all hover:shadow-card-hover hover:-translate-y-1"
               >
@@ -230,13 +235,12 @@ export default function Landing() {
           </div>
           <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
             {pricingPlans.map((plan) => (
-              <div 
+              <div
                 key={plan.name}
-                className={`rounded-xl border p-6 ${
-                  plan.highlighted 
-                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10' 
+                className={`rounded-xl border p-6 ${plan.highlighted
+                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10'
                     : 'border-border bg-card shadow-card'
-                }`}
+                  }`}
               >
                 {plan.highlighted && (
                   <div className="mb-4 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
@@ -257,8 +261,8 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   variant={plan.highlighted ? 'default' : 'outline'}
                   asChild
                 >
@@ -273,7 +277,7 @@ export default function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="bg-secondary/30 py-20 lg:py-32">
+      {/*       <section id="testimonials" className="bg-secondary/30 py-20 lg:py-32">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <h2 className="mb-4 text-3xl font-bold text-foreground lg:text-4xl">
@@ -305,7 +309,7 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA */}
       <section className="py-20 lg:py-32">
@@ -338,12 +342,12 @@ export default function Landing() {
               <span className="font-semibold text-foreground">Seleto AI</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 Seleto AI. Todos os direitos reservados.
+              © 2026 Seleto AI. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Termos</a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacidade</a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contato</a>
+              <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Termos de Uso</Link>
+              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacidade</Link>
+              <a href="mailto:contato@seletoai.com.br" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contato</a>
             </div>
           </div>
         </div>
