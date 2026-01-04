@@ -264,7 +264,7 @@ export default function Terms() {
                 </p>
                 <div className="bg-secondary/30 rounded-lg p-6 space-y-2">
                   <p className="text-foreground"><strong>Email:</strong> suporte@seletoai.com.br</p>
-                  <p className="text-foreground"><strong>Website:</strong> www.seletoai.com.br</p>
+                  <p className="text-foreground"><strong>Website:</strong> https://seleto-ai.vercel.app/</p>
                   <p className="text-foreground"><strong>Horário de Atendimento:</strong> Segunda a Sexta, 9h às 18h</p>
                 </div>
               </section>
